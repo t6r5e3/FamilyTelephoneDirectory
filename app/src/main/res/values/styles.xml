@@ -8,7 +8,8 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="toolbarStyle">@style/Widget.AppCompat.Toolbar</item>
+        <item name="android:windowBackground">@color/colorBackground</item>
+        <!--<item name="toolbarStyle">@style/Widget.AppCompat.Toolbar</item>-->
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

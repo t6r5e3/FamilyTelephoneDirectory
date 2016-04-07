@@ -7,6 +7,8 @@ package com.example.sysucjl.familytelephonedirectory.adapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -16,10 +18,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.sysucjl.familytelephonedirectory.MyClass.ContactItem;
+import com.example.sysucjl.familytelephonedirectory.data.ContactItem;
 import com.example.sysucjl.familytelephonedirectory.PersonInfoActivity;
 import com.example.sysucjl.familytelephonedirectory.R;
-import com.example.sysucjl.familytelephonedirectory.tool.MyTool;
+import com.example.sysucjl.familytelephonedirectory.tools.ColorUtils;
+import com.example.sysucjl.familytelephonedirectory.tools.MyTool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +49,34 @@ public class PersonViewAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         PersonHolder personHolder = (PersonHolder)holder;
         ContactItem person = mPersons.get(position);
-        personHolder.person_name.setText(person.getName());
-        personHolder.person_icon.setBackgroundResource(R.drawable.ic_account_box_black_48dp);
+        personHolder.tvPersonName.setText(person.getName());
+        if(person.getName().charAt(0) < '9' && person.getName().charAt(0) > '0'){
+            personHolder.ivAvatarSim.setVisibility(View.VISIBLE);
+            personHolder.tvAvatarName.setVisibility(View.GONE);
+        }else{
+            personHolder.ivAvatarSim.setVisibility(View.GONE);
+            personHolder.tvAvatarName.setVisibility(View.VISIBLE);
+            personHolder.tvAvatarName.setText(""+person.getName().charAt(0));
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            personHolder.imgPersonIcon.setImageTintList(ColorStateList.valueOf(Color.parseColor(ColorUtils.getColor(person.getName().hashCode()))));
+        }
+        int resultPositon = getPositionForSection(mPersons.get(position).getmSection());
+        if(position == resultPositon){
+            personHolder.tvSection.setText(mPersons.get(position).getmSection());
+        }else{
+            personHolder.tvSection.setText(" ");
+        }
+    }
+
+    public int getPositionForSection(String section) {
+        for (int i = 0; i < mPersons.size(); i++) {
+            String sortStr = mPersons.get(i).getmSection();
+            if (sortStr.equals(section)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Override
@@ -61,14 +90,17 @@ public class PersonViewAdapter extends RecyclerView.Adapter {
     }
 
     class PersonHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        public ImageView person_icon;
-        public TextView person_name;
+        public ImageView imgPersonIcon, ivAvatarSim;
+        public TextView tvPersonName, tvAvatarName, tvSection;
 
         public PersonHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
-            person_icon = (ImageView) itemView.findViewById(R.id.iv_person_icon);
-            person_name = (TextView) itemView.findViewById(R.id.tv_person_name);
+            imgPersonIcon = (ImageView) itemView.findViewById(R.id.iv_person_icon);
+            tvPersonName = (TextView) itemView.findViewById(R.id.tv_person_name);
+            ivAvatarSim = (ImageView) itemView.findViewById(R.id.img_avatar_sim);
+            tvAvatarName = (TextView) itemView.findViewById(R.id.tv_avatar_name);
+            tvSection = (TextView) itemView.findViewById(R.id.tv_section);
         }
 
         @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -80,7 +112,7 @@ public class PersonViewAdapter extends RecyclerView.Adapter {
             intent.setClass(mContext, PersonInfoActivity.class);
             intent.putExtra("tab_name","contact");
             intent.putExtra("name", item.getName());
-            intent.putStringArrayListExtra("phonelist", item.getPhoneList());
+            intent.putStringArrayListExtra("phonelist", item.getmPhoneList());
             mContext.startActivity(intent);
         }
     }

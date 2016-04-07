@@ -22,7 +22,7 @@ public class PhoneListAdapter extends ArrayAdapter<String> {
 
     private int resourceId;
 
-    public  PhoneListAdapter(Context context,int textViewResourceId,List<String> objects){
+    public PhoneListAdapter(Context context, int textViewResourceId, List<String> objects){
         super(context,textViewResourceId,objects);
         resourceId = textViewResourceId;
     }
