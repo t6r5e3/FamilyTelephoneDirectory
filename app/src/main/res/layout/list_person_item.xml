@@ -3,20 +3,50 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
     android:orientation="horizontal"
-    android:padding="10dp"
     android:gravity="center_vertical">
 
-    <ImageView
-        android:id="@+id/iv_person_icon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"/>
+    <TextView
+        android:id="@+id/tv_section"
+        android:layout_width="80dp"
+        android:layout_height="fill_parent"
+        android:textSize="25sp"
+        android:gravity="center"
+        android:textColor="@color/colorTextLight"/>
+
+    <RelativeLayout
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginRight="20dp">
+        <ImageView
+            android:id="@+id/iv_person_icon"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:src="@drawable/ic_round_img"
+            android:tint="@color/colorPrimary"
+            />
+        <ImageView
+            android:id="@+id/img_avatar_sim"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_avatar_sim"/>
+        <TextView
+            android:id="@+id/tv_avatar_name"
+            android:layout_width="fill_parent"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:layout_height="fill_parent" />
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/tv_person_name"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
+        android:layout_height="40dp"
+        android:textColor="@color/colorText"
         android:textSize="17sp"
         android:gravity="center_vertical"/>
 

@@ -5,6 +5,8 @@ package com.example.sysucjl.familytelephonedirectory.fragment;
  */
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,10 +14,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ExpandableListView;
 
 import com.example.sysucjl.familytelephonedirectory.R;
-import com.example.sysucjl.familytelephonedirectory.tool.MyTool;
+import com.example.sysucjl.familytelephonedirectory.adapter.RecordExpandAdapter;
+import com.example.sysucjl.familytelephonedirectory.tools.MyTool;
 import com.example.sysucjl.familytelephonedirectory.adapter.RecordViewAdapter;
+
+import java.lang.annotation.Annotation;
 
 
 public class RecordFragment extends Fragment {
@@ -34,7 +40,10 @@ public class RecordFragment extends Fragment {
      * The fragment's ListView/GridView.
      */
     private android.support.v7.widget.RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private ExpandableListView expandableListView;
+    //private RecyclerView.Adapter mAdapter;
+    private RecordExpandAdapter mExpandAdapter;
+    private int mLastGroupPosition = 0;
 
     /**
      * The Adapter which will be used to populate the ListView/GridView with
@@ -68,26 +77,50 @@ public class RecordFragment extends Fragment {
         }
 
         // TODO: Change Adapter to display your content
-        MyTool tool = new MyTool();
-        mAdapter = new RecordViewAdapter(tool.getCallLog(getContext()), getContext());
+        //mAdapter = new RecordViewAdapter(tool.getCallLog(getContext()), getContext());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_person_list, container, false);
-        // Set the adapter
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerview);
-        mRecyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setAdapter(mAdapter);
+//        View view = inflater.inflate(R.layout.fragment_list, container, false);
+//        // Set the adapter
+//        mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerview);
+//        mRecyclerView.setHasFixedSize(true);
+//        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+//        mRecyclerView.setLayoutManager(layoutManager);
+//        mRecyclerView.setAdapter(mAdapter);
 
+        final View view = inflater.inflate(R.layout.fragment_record, container, false);
+        expandableListView = (ExpandableListView) view.findViewById(R.id.explv_record);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            expandableListView.setNestedScrollingEnabled(true);
+        }
         return view;
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        MyTool tool = new MyTool();
+        mExpandAdapter = new RecordExpandAdapter(getContext(), tool.getCallLog(getContext()));
+        expandableListView.setAdapter(mExpandAdapter);
+
+        expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+            @Override
+            public void onGroupExpand(int groupPosition) {
+                if (mLastGroupPosition != groupPosition) {
+                    expandableListView.collapseGroup(mLastGroupPosition);
+                }
+                mLastGroupPosition = groupPosition;
+            }
+        });
+        mExpandAdapter.setOnRecordAdapterListener(new RecordExpandAdapter.RecordAdapterListener() {
+            @Override
+            public void collapseGroup(int groupPosition) {
+                expandableListView.collapseGroup(groupPosition);
+            }
+        });
     }
 }

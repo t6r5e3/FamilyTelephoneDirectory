@@ -7,6 +7,8 @@ package com.example.sysucjl.familytelephonedirectory.adapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Build;
 import android.provider.CallLog;
 import android.support.v7.widget.RecyclerView;
@@ -19,7 +21,9 @@ import android.widget.TextView;
 
 import com.example.sysucjl.familytelephonedirectory.PersonInfoActivity;
 import com.example.sysucjl.familytelephonedirectory.R;
-import com.example.sysucjl.familytelephonedirectory.MyClass.RecordItem;
+import com.example.sysucjl.familytelephonedirectory.data.RecordItem;
+import com.example.sysucjl.familytelephonedirectory.tools.ColorUtils;
+import com.example.sysucjl.familytelephonedirectory.tools.Tools;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,26 +52,37 @@ public class RecordViewAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         RecordHolder recordHolder = (RecordHolder)holder;
         RecordItem recordItem = mRecordItems.get(position);
-        if(recordItem.getName()!=null)
-            recordHolder.record_name.setText(recordItem.getName());
-        else
-            recordHolder.record_name.setText(recordItem.getNumber());
+        if(recordItem.getName()!=null) {
+            recordHolder.tvRecordName.setText(recordItem.getName());
+            //System.out.println(recordItem.getName()+" "+recordItem.getName().hashCode());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                recordHolder.ivRecordIcon.setImageTintList(ColorStateList.valueOf(Color.parseColor(ColorUtils.getColor(recordItem.getName().hashCode()))));
+            }
+
+        }
+        else {
+            //System.out.println(recordItem.getNumber()+" "+recordItem.getNumber().hashCode());
+            recordHolder.tvRecordName.setText(Tools.getNumberFormat(recordItem.getNumber()));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                recordHolder.ivRecordIcon.setImageTintList(ColorStateList.valueOf(Color.parseColor(ColorUtils.getColor(recordItem.getNumber().hashCode()))));
+            }
+        }
         int callcode = recordItem.getType();
         switch (callcode) {
             case CallLog.Calls.OUTGOING_TYPE:
-                recordHolder.record_icon.setBackgroundResource(R.drawable.ic_calllog_outgoing_nomal);
+                recordHolder.imgRecordType.setBackgroundResource(R.drawable.ic_outgoing);
                 break;
             case CallLog.Calls.INCOMING_TYPE:
-                recordHolder.record_icon.setBackgroundResource(R.drawable.ic_calllog_incomming_normal);
+                recordHolder.imgRecordType.setBackgroundResource(R.drawable.ic_incoming);
                 break;
             case CallLog.Calls.MISSED_TYPE:
-                recordHolder.record_icon.setBackgroundResource(R.drawable.ic_calllog_missed_normal);
+                recordHolder.imgRecordType.setBackgroundResource(R.drawable.ic_missed);
                 break;
         }
 
         SimpleDateFormat sfd = new SimpleDateFormat("MM-dd hh:mm");
         Date date = new Date(recordItem.getCallTime());// 打电话的日期
-        recordHolder.record_date.setText(sfd.format(date));
+        recordHolder.tvRecordDate.setText(sfd.format(date));
     }
 
     @Override
@@ -81,16 +96,18 @@ public class RecordViewAdapter extends RecyclerView.Adapter {
     }
 
     class RecordHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        public ImageView record_icon;
-        public TextView record_name;
-        public TextView record_date;
+        public ImageView ivRecordIcon;
+        public TextView tvRecordName;
+        public TextView tvRecordDate;
+        public ImageView imgRecordType;
 
         public RecordHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
-            record_icon = (ImageView) itemView.findViewById(R.id.iv_record_icon);
-            record_name = (TextView) itemView.findViewById(R.id.tv_record_name);
-            record_date = (TextView) itemView.findViewById(R.id.tv_record_date);
+            ivRecordIcon = (ImageView) itemView.findViewById(R.id.iv_record_icon);
+            tvRecordName = (TextView) itemView.findViewById(R.id.tv_record_name);
+            tvRecordDate = (TextView) itemView.findViewById(R.id.tv_record_date);
+            imgRecordType = (ImageView) itemView.findViewById(R.id.img_record_type);
         }
 
         @TargetApi(Build.VERSION_CODES.JELLY_BEAN)

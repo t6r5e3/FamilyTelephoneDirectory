@@ -1,5 +1,7 @@
 package com.example.sysucjl.familytelephonedirectory;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -10,38 +12,54 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.design.widget.TabLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.example.sysucjl.familytelephonedirectory.adapter.ViewPagerAdapter;
+import com.example.sysucjl.familytelephonedirectory.tools.ScreenTools;
+
+import java.util.Collection;
 
 
 public class MainActivity extends AppCompatActivity{
+
+    private RelativeLayout rlFloatBtn;
+    private int mSrollWidth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(android.R.drawable.ic_menu_add);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("  家庭电话簿");
+        setSupportActionBar(toolbar);
+        //toolbar.setLogo(R.drawable.ic_logo);
+
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"));
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             }
         });
 
+        rlFloatBtn = (RelativeLayout) findViewById(R.id.rl_floatBtn);
+
+        ScreenTools s = ScreenTools.instance(getApplicationContext());
+        mSrollWidth = s.getScreenWidth()/2 - s.dip2px(56)/2 - s.dip2px(16);
+        //mSrollWidth = s.getScreenWidth()/2
         final ViewPager viewPager = (ViewPager) findViewById(R.id.main_viewpager);
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(adapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tablayout);
         tabLayout.setTabsFromPagerAdapter(adapter);
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                viewPager.setCurrentItem(tab.getPosition());
+                viewPager.setCurrentItem(tab.getPosition(), true);
             }
 
             @Override
@@ -54,8 +72,37 @@ public class MainActivity extends AppCompatActivity{
 
             }
         });
-        TabLayout.TabLayoutOnPageChangeListener listener = new TabLayout.TabLayoutOnPageChangeListener(tabLayout);
-        viewPager.addOnPageChangeListener(listener);
+
+        TabLayout.TabLayoutOnPageChangeListener tabLayoutListener = new TabLayout.TabLayoutOnPageChangeListener(tabLayout);
+        viewPager.addOnPageChangeListener(tabLayoutListener);
+
+        viewPager.setAdapter(adapter);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                //System.out.println("" + position + " " + positionOffset);
+                if(position == 1){
+                    rlFloatBtn.scrollTo((int) (-mSrollWidth), 0);
+                    return;
+                }
+                rlFloatBtn.scrollTo((int) (-positionOffset*mSrollWidth), 0);
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if(position == 0)
+                    fab.setImageResource(R.drawable.ic_phone);
+                if(position == 1)
+                    fab.setImageResource(android.R.drawable.ic_input_add);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+
     }
 
     @Override
