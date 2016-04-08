@@ -32,18 +32,39 @@ public class PhoneListAdapter extends ArrayAdapter<String> {
         this.mColor = color;
     }
 
-    @Override
-    public View getView(int position,View convertView,ViewGroup parent){
-        final String item =getItem(position);
-        View view = LayoutInflater.from(getContext()).inflate(mResourceId, null);
-        TextView phone_number = (TextView)view.findViewById(R.id.tv_phone_number);
-        ImageView message = (ImageView)view.findViewById(R.id.sent_message);
+    public void setmColor(int mColor) {
+        this.mColor = mColor;
+        notifyDataSetChanged();
+    }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            message.setImageTintList(ColorStateList.valueOf(mColor));
+    @Override
+    public View getView(int position,View convertView,ViewGroup parent) {
+        PhoneListHolder phoneListHolder = null;
+        if (convertView == null) {
+            phoneListHolder = new PhoneListHolder();
+            convertView = LayoutInflater.from(getContext()).inflate(mResourceId, null);
+            phoneListHolder.ivbtnSetMessage = (ImageButton) convertView.findViewById(R.id.imgbtn_sent_message);
+            phoneListHolder.tvPhoneNum = (TextView) convertView.findViewById(R.id.tv_phone_number);
+            phoneListHolder.tvLocation = (TextView) convertView.findViewById(R.id.tv_location);
+            phoneListHolder.ivPhone = (ImageView) convertView.findViewById(R.id.iv_phone);
+            convertView.setTag(phoneListHolder);
+        }else{
+            phoneListHolder = (PhoneListHolder) convertView.getTag();
+        }
+        final String item = getItem(position);
+
+        if(position == 0){
+            phoneListHolder.ivPhone.setVisibility(View.VISIBLE);
+        }else{
+            phoneListHolder.ivPhone.setVisibility(View.GONE);
         }
 
-        message.setOnClickListener(new View.OnClickListener() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            phoneListHolder.ivbtnSetMessage.setImageTintList(ColorStateList.valueOf(mColor));
+            phoneListHolder.ivPhone.setImageTintList(ColorStateList.valueOf(mColor));
+        }
+
+        phoneListHolder.ivbtnSetMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_SENDTO);
@@ -53,8 +74,8 @@ public class PhoneListAdapter extends ArrayAdapter<String> {
             }
         });
 
-        phone_number.setText(item);
-        phone_number.setOnClickListener(new View.OnClickListener() {
+        phoneListHolder.tvPhoneNum.setText(item);
+        phoneListHolder.tvPhoneNum.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_DIAL);
@@ -63,7 +84,7 @@ public class PhoneListAdapter extends ArrayAdapter<String> {
                 getContext().startActivity(intent);
             }
         });
-        return view;
+        return convertView;
     }
 
     class PhoneListHolder{
