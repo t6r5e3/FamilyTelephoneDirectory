@@ -1,14 +1,19 @@
 package com.example.sysucjl.familytelephonedirectory;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -21,6 +26,9 @@ public class PersonInfoActivity extends AppCompatActivity {
     private ImageView ivBackDrop;
     private Toolbar mToolbar;
     private CollapsingToolbarLayout mToolbarLayout;
+    private Button btnSentMessage;
+    private View vStatusBar;
+    private PhoneListAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,21 +44,35 @@ public class PersonInfoActivity extends AppCompatActivity {
         mToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         mToolbarLayout.setBackgroundColor(color);
         mToolbarLayout.setContentScrimColor(color);
-        mToolbar.setBackgroundColor(color);
         mToolbarLayout.setTitle(personName);
+        btnSentMessage = (Button) findViewById(R.id.btn_sent_mesage);
+        btnSentMessage.setBackgroundColor(color);
+
+        BitmapDrawable bd = (BitmapDrawable) ivBackDrop.getDrawable();
+        Palette.from(bd.getBitmap()).generate(new Palette.PaletteAsyncListener() {
+            @Override
+            public void onGenerated(Palette palette) {
+                Palette.Swatch vibrant = palette.getVibrantSwatch();
+                if(vibrant != null){
+                    mToolbarLayout.setContentScrimColor(vibrant.getRgb());
+                    btnSentMessage.setBackgroundColor(vibrant.getRgb());
+                    mAdapter.setmColor(vibrant.getRgb());
+                }
+            }
+        });
 
         if(intent.getStringExtra("tab_name").equals("contact")){
-            final PhoneListAdapter adapter = new PhoneListAdapter(this,R.layout.list_phone_item,intent.getStringArrayListExtra("phonelist"), color);
+            mAdapter = new PhoneListAdapter(this,R.layout.list_phone_item,intent.getStringArrayListExtra("phonelist"), color);
             final ListView phoneList = (ListView)findViewById(R.id.phone_list);
 
             phoneList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    adapter.getView(position,view,phoneList);
+                    mAdapter.getView(position, view, phoneList);
                 }
             });
 
-            phoneList.setAdapter(adapter);
+            phoneList.setAdapter(mAdapter);
             setListViewHeightBasedOnChildren(phoneList);
         }
     }

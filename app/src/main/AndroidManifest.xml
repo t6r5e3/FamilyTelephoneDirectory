@@ -25,7 +25,7 @@
         <activity
             android:name=".PersonInfoActivity"
             android:label="@string/title_activity_person_info"
-            android:theme="@style/AppTheme" >
+            android:theme="@style/TranslucenStatusAppTheme" >
         </activity>
     </application>
 
