@@ -1,6 +1,7 @@
 package com.example.sysucjl.familytelephonedirectory;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -8,12 +9,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.example.sysucjl.familytelephonedirectory.adapter.PhoneListAdapter;
+import com.example.sysucjl.familytelephonedirectory.tools.ColorUtils;
 
 public class PersonInfoActivity extends AppCompatActivity {
+
+    private ImageView ivBackDrop;
+    private Toolbar mToolbar;
+    private CollapsingToolbarLayout mToolbarLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,16 +28,19 @@ public class PersonInfoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_person_info);
         final Intent intent = getIntent();
         String personName = intent.getStringExtra("name");
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-
-        toolbarLayout.setTitle(personName);
+        int color = Color.parseColor(ColorUtils.getColor(personName.hashCode()));
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        ivBackDrop = (ImageView) findViewById(R.id.iv_backdrop);
+        ivBackDrop.setBackgroundColor(color);
+        mToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        mToolbarLayout.setBackgroundColor(color);
+        mToolbarLayout.setContentScrimColor(color);
+        mToolbar.setBackgroundColor(color);
+        mToolbarLayout.setTitle(personName);
 
         if(intent.getStringExtra("tab_name").equals("contact")){
-            final PhoneListAdapter adapter = new PhoneListAdapter(this,R.layout.list_phone_item,intent.getStringArrayListExtra("phonelist"));
+            final PhoneListAdapter adapter = new PhoneListAdapter(this,R.layout.list_phone_item,intent.getStringArrayListExtra("phonelist"), color);
             final ListView phoneList = (ListView)findViewById(R.id.phone_list);
 
             phoneList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -69,5 +79,4 @@ public class PersonInfoActivity extends AppCompatActivity {
         // params.height最后得到整个ListView完整显示需要的高度
         listView.setLayoutParams(params);
     }
-
 }

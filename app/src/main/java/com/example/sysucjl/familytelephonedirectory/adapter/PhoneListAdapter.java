@@ -6,11 +6,14 @@ package com.example.sysucjl.familytelephonedirectory.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.net.Uri;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,20 +23,25 @@ import java.util.List;
 
 public class PhoneListAdapter extends ArrayAdapter<String> {
 
-    private int resourceId;
+    private int mResourceId;
+    private int mColor;
 
-    public PhoneListAdapter(Context context, int textViewResourceId, List<String> objects){
+    public PhoneListAdapter(Context context, int textViewResourceId, List<String> objects, int color){
         super(context,textViewResourceId,objects);
-        resourceId = textViewResourceId;
+        mResourceId = textViewResourceId;
+        this.mColor = color;
     }
 
     @Override
     public View getView(int position,View convertView,ViewGroup parent){
         final String item =getItem(position);
-        View view = LayoutInflater.from(getContext()).inflate(resourceId, null);
+        View view = LayoutInflater.from(getContext()).inflate(mResourceId, null);
         TextView phone_number = (TextView)view.findViewById(R.id.tv_phone_number);
         ImageView message = (ImageView)view.findViewById(R.id.sent_message);
-        message.setBackgroundResource(R.drawable.ic_message_black_36dp);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            message.setImageTintList(ColorStateList.valueOf(mColor));
+        }
 
         message.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,5 +64,11 @@ public class PhoneListAdapter extends ArrayAdapter<String> {
             }
         });
         return view;
+    }
+
+    class PhoneListHolder{
+        public ImageView ivPhone;
+        public ImageButton ivbtnSetMessage;
+        public TextView tvPhoneNum, tvLocation;
     }
 }
