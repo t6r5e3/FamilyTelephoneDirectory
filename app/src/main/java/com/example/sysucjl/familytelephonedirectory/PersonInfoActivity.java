@@ -1,6 +1,7 @@
 package com.example.sysucjl.familytelephonedirectory;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.sysucjl.familytelephonedirectory.adapter.PhoneListAdapter;
+import com.example.sysucjl.familytelephonedirectory.data.CityInfo;
 import com.example.sysucjl.familytelephonedirectory.data.WeatherInfo;
 import com.example.sysucjl.familytelephonedirectory.tools.ColorUtils;
 import com.example.sysucjl.familytelephonedirectory.tools.QueryWeather;
@@ -38,6 +40,7 @@ public class PersonInfoActivity extends AppCompatActivity {
     /*  显示天气部分 */
     private TextView weather;
     private WeatherInfo weatherInfo;
+    private CityInfo cityInfo;
     public static final int SHOW_RESPONSE = 0;
     private Handler handler = new Handler() {
         public void handleMessage(Message msg) {
@@ -71,6 +74,15 @@ public class PersonInfoActivity extends AppCompatActivity {
         btnSentMessage.setBackgroundColor(color);
 
         weather = (TextView)findViewById(R.id.weather);
+        //判断是否第一次运行程序
+        SharedPreferences pref = getSharedPreferences("city",MODE_PRIVATE);
+        boolean first = pref.getBoolean("first", true);
+        if(first) {
+            SharedPreferences.Editor editor = getSharedPreferences("city", MODE_PRIVATE).edit();
+            editor.putBoolean("first", false);
+            cityInfo = new CityInfo();
+            cityInfo.create(editor);
+        }
 
         BitmapDrawable bd = (BitmapDrawable) ivBackDrop.getDrawable();
         Palette.from(bd.getBitmap()).generate(new Palette.PaletteAsyncListener() {
@@ -135,9 +147,12 @@ public class PersonInfoActivity extends AppCompatActivity {
                 HttpURLConnection connection = null;
                 try {
                     //String num=editText.getText().toString().trim();
-                    String num = "2350";
+
+                    String num = "河源";
+                    SharedPreferences pref = getSharedPreferences("city",MODE_PRIVATE);
+                    String code = pref.getString(num, "");
                     QueryWeather xmlser=new QueryWeather();
-                    weatherInfo = xmlser.query(num);
+                    weatherInfo = xmlser.query(code);
                     //Log.i("tag",res);
                     //Result.setText(res);
                     Message message = new Message();
