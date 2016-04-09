@@ -1,11 +1,11 @@
 package com.example.sysucjl.familytelephonedirectory;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -17,9 +17,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.sysucjl.familytelephonedirectory.adapter.PhoneListAdapter;
+import com.example.sysucjl.familytelephonedirectory.data.WeatherInfo;
 import com.example.sysucjl.familytelephonedirectory.tools.ColorUtils;
+import com.example.sysucjl.familytelephonedirectory.tools.QueryWeather;
+
+import java.net.HttpURLConnection;
 
 public class PersonInfoActivity extends AppCompatActivity {
 
@@ -29,6 +34,23 @@ public class PersonInfoActivity extends AppCompatActivity {
     private Button btnSentMessage;
     private View vStatusBar;
     private PhoneListAdapter mAdapter;
+
+    /*  显示天气部分 */
+    private TextView weather;
+    private WeatherInfo weatherInfo;
+    public static final int SHOW_RESPONSE = 0;
+    private Handler handler = new Handler() {
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case SHOW_RESPONSE:
+                    WeatherInfo response = (WeatherInfo) msg.obj;
+                    // 在这里进行UI操作，将结果显示到界面上
+                    //  textView.setText(response);
+                    String s = response.cityName + "  " + response.weather + "   " + response.tem;
+                    weather.setText(s);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +69,8 @@ public class PersonInfoActivity extends AppCompatActivity {
         mToolbarLayout.setTitle(personName);
         btnSentMessage = (Button) findViewById(R.id.btn_sent_mesage);
         btnSentMessage.setBackgroundColor(color);
+
+        weather = (TextView)findViewById(R.id.weather);
 
         BitmapDrawable bd = (BitmapDrawable) ivBackDrop.getDrawable();
         Palette.from(bd.getBitmap()).generate(new Palette.PaletteAsyncListener() {
@@ -75,6 +99,7 @@ public class PersonInfoActivity extends AppCompatActivity {
             phoneList.setAdapter(mAdapter);
             setListViewHeightBasedOnChildren(phoneList);
         }
+        sendRequestWithHttpURLConnection();
     }
 
     //解决ListView在ScrollView中无法显示多列的情况
@@ -100,5 +125,34 @@ public class PersonInfoActivity extends AppCompatActivity {
         // listView.getDividerHeight()获取子项间分隔符占用的高度
         // params.height最后得到整个ListView完整显示需要的高度
         listView.setLayoutParams(params);
+    }
+
+    private void sendRequestWithHttpURLConnection() {
+        // 开启线程来发起网络请求
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                HttpURLConnection connection = null;
+                try {
+                    //String num=editText.getText().toString().trim();
+                    String num = "2350";
+                    QueryWeather xmlser=new QueryWeather();
+                    weatherInfo = xmlser.query(num);
+                    //Log.i("tag",res);
+                    //Result.setText(res);
+                    Message message = new Message();
+                    message.what = SHOW_RESPONSE;
+                    // 将服务器返回的结果存放到Message中
+                    message.obj = weatherInfo;
+                    handler.sendMessage(message);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (connection != null) {
+                        connection.disconnect();
+                    }
+                }
+            }
+        }).start();
     }
 }
