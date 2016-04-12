@@ -277,7 +277,10 @@ public class DBManager extends SQLiteOpenHelper {
                         Cursor cursor = db.rawQuery(sql, param);
                         if (cursor.moveToNext()) {
                             //result = cursor.getString(0)+"固话";
-                            result = cursor.getString(0).substring(2);
+                            if(zhixiashi(cursor.getString(0)))
+                                result = cursor.getString(0);
+                            else
+                                result = cursor.getString(0).substring(2);
                         }
                         cursor.close();
                     }
@@ -303,7 +306,10 @@ public class DBManager extends SQLiteOpenHelper {
                                 }
                             }
                            // result=temp.substring(0,middleIndex)+temp.substring(middleIndex+1);
-                            result=temp.substring(2,middleIndex);
+                            if(zhixiashi(temp.substring(0, 2)))
+                                result = temp.substring(0,2);
+                            else
+                                result=temp.substring(2,middleIndex);
                             //result=temp;
                         }
                         cursor.close();
@@ -320,6 +326,12 @@ public class DBManager extends SQLiteOpenHelper {
             }
         }
         return result;
+    }
+
+    private boolean zhixiashi(String str)
+    {
+        return str.toString().equals("北京")  ||  str.toString().equals("上海") || str.toString().equals("天津") || str.toString().equals("重庆");
+
     }
 
 
