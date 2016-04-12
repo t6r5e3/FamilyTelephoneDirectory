@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Created by Administrator on 2016/4/6.
  */
-public class Tools {
+public class DateTools {
 
     public static Map<Integer, String> mDayMap;
 

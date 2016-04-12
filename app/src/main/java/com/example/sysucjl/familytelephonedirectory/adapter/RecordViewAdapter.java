@@ -23,7 +23,7 @@ import com.example.sysucjl.familytelephonedirectory.PersonInfoActivity;
 import com.example.sysucjl.familytelephonedirectory.R;
 import com.example.sysucjl.familytelephonedirectory.data.RecordItem;
 import com.example.sysucjl.familytelephonedirectory.tools.ColorUtils;
-import com.example.sysucjl.familytelephonedirectory.tools.Tools;
+import com.example.sysucjl.familytelephonedirectory.tools.DateTools;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ public class RecordViewAdapter extends RecyclerView.Adapter {
         }
         else {
             //System.out.println(recordItem.getNumber()+" "+recordItem.getNumber().hashCode());
-            recordHolder.tvRecordName.setText(Tools.getNumberFormat(recordItem.getNumber()));
+            recordHolder.tvRecordName.setText(DateTools.getNumberFormat(recordItem.getNumber()));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 recordHolder.ivRecordIcon.setImageTintList(ColorStateList.valueOf(Color.parseColor(ColorUtils.getColor(recordItem.getNumber().hashCode()))));
             }

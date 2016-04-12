@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.example.sysucjl.familytelephonedirectory.R;
 import com.example.sysucjl.familytelephonedirectory.data.ContactItem;
 import com.example.sysucjl.familytelephonedirectory.tools.CharacterParser;
-import com.example.sysucjl.familytelephonedirectory.tools.MyTool;
+import com.example.sysucjl.familytelephonedirectory.tools.ContactOptionManager;
 import com.example.sysucjl.familytelephonedirectory.adapter.PersonViewAdapter;
 
 import java.util.ArrayList;
@@ -76,7 +76,7 @@ public class PersonFragment extends Fragment{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        MyTool tool = new MyTool();
+        ContactOptionManager tool = new ContactOptionManager();
         mContactItems = new ArrayList<>();
         mContactItems = tool.getBriefContactInfor(getContext());
         for(int i = 0; i < mContactItems.size(); i++){

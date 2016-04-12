@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Created by sysucjl on 16-4-4.
  */
-public class MyTool {
+public class ContactOptionManager {
 
     //读取通讯记录
     public List<RecordItem> getCallLog(Context context) {
@@ -36,6 +36,7 @@ public class MyTool {
             return null;
         }
         Cursor cursor = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, strOrder);
+        int id_index = cursor.getColumnIndex(CallLog.Calls._ID);
         int number_index = cursor.getColumnIndex(CallLog.Calls.NUMBER);
         int type_index = cursor.getColumnIndex(CallLog.Calls.TYPE);
         int date_index = cursor.getColumnIndex(CallLog.Calls.DATE);
@@ -45,21 +46,30 @@ public class MyTool {
         List<RecordItem> recordItems = new ArrayList<>();
         String lastphNum = "";
         while (cursor.moveToNext()) {
+            int callid = cursor.getInt(id_index);
             String phNum = cursor.getString(number_index);
             int callcode = Integer.parseInt(cursor.getString(type_index));
             long callDate = Long.valueOf(cursor.getString(date_index));
             long callDuration = Long.valueOf(cursor.getString(duration_index));
             String name = cursor.getString(name_index);
-            if(phNum.equals(lastphNum) && recordItems.size() > 0){
-                recordItems.get(recordItems.size()-1).addRecordSegement(callcode, callDate, callDuration);
-            }else{
-                RecordItem item = new RecordItem(callcode,callDate,callDuration,phNum,name);
+            if (phNum.equals(lastphNum) && recordItems.size() > 0) {
+                recordItems.get(recordItems.size() - 1).addRecordSegement(callid,callcode, callDate, callDuration);
+            } else {
+                RecordItem item = new RecordItem(callid, callcode, callDate, callDuration, phNum, name);
                 recordItems.add(item);
             }
             lastphNum = phNum;
         }
         cursor.close();
         return recordItems;
+    }
+
+    //删除通讯记录
+    public void deleteRecord(Context context, int id) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        context.getContentResolver().delete(CallLog.Calls.CONTENT_URI, CallLog.Calls._ID + "=?", new String[]{id + ""});
     }
 
     //读取联系人列表
