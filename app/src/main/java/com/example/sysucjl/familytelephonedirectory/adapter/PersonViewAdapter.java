@@ -22,7 +22,7 @@ import com.example.sysucjl.familytelephonedirectory.data.ContactItem;
 import com.example.sysucjl.familytelephonedirectory.PersonInfoActivity;
 import com.example.sysucjl.familytelephonedirectory.R;
 import com.example.sysucjl.familytelephonedirectory.tools.ColorUtils;
-import com.example.sysucjl.familytelephonedirectory.tools.MyTool;
+import com.example.sysucjl.familytelephonedirectory.tools.ContactOptionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,7 +106,7 @@ public class PersonViewAdapter extends RecyclerView.Adapter {
         @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
         @Override
         public void onClick(View v) {
-            MyTool tool = new MyTool();
+            ContactOptionManager tool = new ContactOptionManager();
             ContactItem item = tool.getDetailFromContactID(v.getContext(), mPersons.get(getPosition()));
             Intent intent = new Intent();
             intent.setClass(mContext, PersonInfoActivity.class);

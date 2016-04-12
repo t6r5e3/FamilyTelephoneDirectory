@@ -1,40 +1,42 @@
 package com.example.sysucjl.familytelephonedirectory.adapter;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.provider.CallLog;
+import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.widget.ExpandableListAdapter;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.sysucjl.familytelephonedirectory.R;
 import com.example.sysucjl.familytelephonedirectory.data.RecordItem;
 import com.example.sysucjl.familytelephonedirectory.data.RecordSegment;
 import com.example.sysucjl.familytelephonedirectory.tools.ColorUtils;
+import com.example.sysucjl.familytelephonedirectory.tools.ContactOptionManager;
 import com.example.sysucjl.familytelephonedirectory.tools.DBManager;
-import com.example.sysucjl.familytelephonedirectory.tools.Tools;
+import com.example.sysucjl.familytelephonedirectory.tools.DateTools;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**
  * Created by Administrator on 2016/4/7.
  */
-public class RecordExpandAdapter implements ExpandableListAdapter{
+public class RecordExpandAdapter extends BaseExpandableListAdapter {
 
     private Context mContext;
     private List<RecordItem> mRecordItems;
@@ -147,6 +149,42 @@ public class RecordExpandAdapter implements ExpandableListAdapter{
                     }
                 });
             }
+            recordGroupHolder.tvDelete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    //SweetAlertDialog是导入德第三方dialog
+                    new SweetAlertDialog(mContext, SweetAlertDialog.WARNING_TYPE)
+                            .setTitleText("Are you sure?")
+                            .setContentText("Won't be able to recover this record!")
+                            .setCancelText("Cancel")
+                            .setConfirmText("Delete")
+                            .showCancelButton(true)
+                            .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                @Override
+                                public void onClick(SweetAlertDialog sDialog) {
+
+                                    ContactOptionManager tool = new ContactOptionManager();
+                                    for(int i=0;i<recordItem.getRecordSegments().size();i++){
+                                        tool.deleteRecord(mContext,recordItem.getRecordSegments().get(i).getId());
+                                    }
+                                    mRecordItems.remove(groupPosition);
+                                    mAdapterListener.MynotifyDataSetChanged(groupPosition);
+
+                                    sDialog.setTitleText("Deleted!")
+                                            .setContentText("Your record has been deleted!")
+                                            .setConfirmText("OK")
+                                            .showCancelButton(false)
+                                            .setCancelClickListener(null)
+                                            .setConfirmClickListener(null)
+                                            .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+
+                                }
+
+                            })
+                            .show();
+                }
+            });
         }
         else {
             recordGroupHolder.llBackground.setBackgroundColor(Color.parseColor("#00000000"));
@@ -169,7 +207,7 @@ public class RecordExpandAdapter implements ExpandableListAdapter{
         else {
             recordGroupHolder.tvPhoneNum.setVisibility(View.GONE);
             if(!TextUtils.isEmpty(recordItem.getNumber())){
-                recordGroupHolder.tvRecordName.setText(Tools.getNumberFormat(recordItem.getNumber()));
+                recordGroupHolder.tvRecordName.setText(DateTools.getNumberFormat(recordItem.getNumber()));
             }else{
                 recordGroupHolder.tvRecordName.setText("未知");
             }
@@ -206,7 +244,7 @@ public class RecordExpandAdapter implements ExpandableListAdapter{
             }
             recordGroupHolder.llRecordType.addView(imageView);
         }
-        recordGroupHolder.tvRecordDate.setText(Tools.getRecordItemData(recordItem.getCallTime()));
+        recordGroupHolder.tvRecordDate.setText(DateTools.getRecordItemData(recordItem.getCallTime()));
         return convertView;
     }
 
@@ -244,8 +282,8 @@ public class RecordExpandAdapter implements ExpandableListAdapter{
                 recordChildHolder.tvRecordDuration.setVisibility(View.GONE);
                 break;
         }
-        recordChildHolder.tvRecordDate.setText(String.valueOf(Tools.getRecordSegmentDate(recordSegment.getCallTime())));
-        recordChildHolder.tvRecordDuration.setText(Tools.getDuration(recordSegment.getDuration()));
+        recordChildHolder.tvRecordDate.setText(String.valueOf(DateTools.getRecordSegmentDate(recordSegment.getCallTime())));
+        recordChildHolder.tvRecordDuration.setText(DateTools.getDuration(recordSegment.getDuration()));
         if(childPosition == getChildrenCount(groupPosition) - 1){
             recordChildHolder.imgShadow.setVisibility(View.VISIBLE);
         }else{
@@ -315,6 +353,7 @@ public class RecordExpandAdapter implements ExpandableListAdapter{
 
     public interface RecordAdapterListener{
         public void collapseGroup(int groupPosition);
+        public void MynotifyDataSetChanged(int groupPosition);
     }
 }
 

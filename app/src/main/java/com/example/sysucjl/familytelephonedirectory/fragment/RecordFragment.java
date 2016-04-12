@@ -4,13 +4,9 @@ package com.example.sysucjl.familytelephonedirectory.fragment;
  * Created by sysucjl on 16-3-31.
  */
 
-import android.app.Activity;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,10 +14,7 @@ import android.widget.ExpandableListView;
 
 import com.example.sysucjl.familytelephonedirectory.R;
 import com.example.sysucjl.familytelephonedirectory.adapter.RecordExpandAdapter;
-import com.example.sysucjl.familytelephonedirectory.tools.MyTool;
-import com.example.sysucjl.familytelephonedirectory.adapter.RecordViewAdapter;
-
-import java.lang.annotation.Annotation;
+import com.example.sysucjl.familytelephonedirectory.tools.ContactOptionManager;
 
 
 public class RecordFragment extends Fragment {
@@ -103,7 +96,7 @@ public class RecordFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        MyTool tool = new MyTool();
+        ContactOptionManager tool = new ContactOptionManager();
         mExpandAdapter = new RecordExpandAdapter(getContext(), tool.getCallLog(getContext()));
         expandableListView.setAdapter(mExpandAdapter);
 
@@ -119,6 +112,12 @@ public class RecordFragment extends Fragment {
         mExpandAdapter.setOnRecordAdapterListener(new RecordExpandAdapter.RecordAdapterListener() {
             @Override
             public void collapseGroup(int groupPosition) {
+                expandableListView.collapseGroup(groupPosition);
+            }
+
+            @Override
+            public void MynotifyDataSetChanged(int groupPosition) {
+                mExpandAdapter.notifyDataSetChanged();
                 expandableListView.collapseGroup(groupPosition);
             }
         });
