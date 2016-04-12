@@ -81,6 +81,7 @@ public class PersonInfoActivity extends AppCompatActivity {
         dbHelper.createDataBase();
 
         weather = (TextView)findViewById(R.id.weather);
+        weather.setText("正在查询天气...");
         //判断是否第一次运行程序
         SharedPreferences pref = getSharedPreferences("city",MODE_PRIVATE);
         boolean first = pref.getBoolean("first", true);
