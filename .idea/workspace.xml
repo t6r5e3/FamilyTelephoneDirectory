@@ -50,7 +50,7 @@
       <file leaf-file-name="PersonInfoActivity.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/sysucjl/familytelephonedirectory/PersonInfoActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.53373015">
+            <state vertical-scroll-proportion="0.71626985">
               <caret line="62" column="20" selection-start-line="62" selection-start-column="20" selection-end-line="62" selection-end-column="20" />
               <folding>
                 <element signature="e#1843#2864#0" expanded="true" />
@@ -2670,7 +2670,7 @@
     </option>
     <option name="modificationStamps">
       <map>
-        <entry key="D:\AndroidApp\FamilyTelephoneDirectory\FamilyTelephoneDirectory" value="8762752266599" />
+        <entry key="D:\AndroidApp\FamilyTelephoneDirectory\FamilyTelephoneDirectory" value="8762832184407" />
       </map>
     </option>
     <option name="projectBuildClasspath">
@@ -2891,6 +2891,7 @@
                             <option value="G:/Android/sdk/extras/android/m2repository/com/android/support/recyclerview-v7/23.1.1/recyclerview-v7-23.1.1.aar" />
                             <option value="G:/Android/sdk/extras/android/m2repository/com/android/support/design/23.1.1/design-23.1.1.aar" />
                             <option value="G:/Android/sdk/extras/android/m2repository/com/android/support/palette-v7/23.1.1/palette-v7-23.1.1.aar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.obiteaaron/pinyin4j-multi/1.0.0/c7d91d6abaf36f761d0b9cf211516819cdbff311/pinyin4j-multi-1.0.0.jar" />
                             <option value="G:/Android/sdk/extras/android/m2repository/com/android/support/support-v4/23.1.1/support-v4-23.1.1.aar" />
                             <option value="G:/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/23.1.1/support-annotations-23.1.1.jar" />
                             <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.pnikosis/materialish-progress/1.0/b1898820717b3bb087e268893b5f5c34681c77c5/materialish-progress-1.0.aar" />
@@ -3946,7 +3947,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/sysucjl/familytelephonedirectory/PersonInfoActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.53373015">
+        <state vertical-scroll-proportion="0.71626985">
           <caret line="62" column="20" selection-start-line="62" selection-start-column="20" selection-end-line="62" selection-end-column="20" />
           <folding>
             <element signature="e#1843#2864#0" expanded="true" />
