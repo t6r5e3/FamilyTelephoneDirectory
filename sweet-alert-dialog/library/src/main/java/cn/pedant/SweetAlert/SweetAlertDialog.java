@@ -235,7 +235,6 @@ public class SweetAlertDialog extends Dialog implements View.OnClickListener {
         changeAlertType(alertType, false);
     }
 
-
     public String getTitleText () {
         return mTitleText;
     }

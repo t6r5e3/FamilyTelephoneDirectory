@@ -64,7 +64,11 @@
                 android:layout_height="80dp"
                 android:layout_marginTop="-13dp"
                 android:layout_gravity="right"
+<<<<<<< HEAD
                 android:background="@android:color/white" />
+=======
+                android:background="#fafafa" />
+>>>>>>> 1e32fa5f5aa06eb20673730b3f1ff22ae685b496
 
             <View
                 android:id="@+id/mask_left"
@@ -72,7 +76,11 @@
                 android:layout_height="60dp"
                 android:layout_marginLeft="-3dp"
                 android:layout_gravity="left"
+<<<<<<< HEAD
                 android:background="@android:color/white" />
+=======
+                android:background="#fafafa" />
+>>>>>>> 1e32fa5f5aa06eb20673730b3f1ff22ae685b496
 
             <View
                 android:layout_width="match_parent"
