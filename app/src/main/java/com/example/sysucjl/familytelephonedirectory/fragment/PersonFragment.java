@@ -17,6 +17,12 @@ import com.example.sysucjl.familytelephonedirectory.tools.CharacterParser;
 import com.example.sysucjl.familytelephonedirectory.tools.ContactOptionManager;
 import com.example.sysucjl.familytelephonedirectory.adapter.PersonViewAdapter;
 
+import net.sourceforge.pinyin4j.PinyinHelper;
+import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
+import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
+import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
+import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,12 +85,69 @@ public class PersonFragment extends Fragment{
         ContactOptionManager tool = new ContactOptionManager();
         mContactItems = new ArrayList<>();
         mContactItems = tool.getBriefContactInfor(getContext());
+        HanyuPinyinOutputFormat defaultFormat = new HanyuPinyinOutputFormat();
+        defaultFormat.setCaseType(HanyuPinyinCaseType.UPPERCASE);
+        defaultFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+        String pinyin = "";
+        String sortLetter = "A";
+        String lastSortLetter = "A";
+        boolean continute = true;
         for(int i = 0; i < mContactItems.size(); i++){
-            String pinyin = CharacterParser.getSelling(mContactItems.get(i).getName());
+            //pinyin = PinyinHelper.toHanYuPinyinStringFirstLetter(mContactItems.get(i).getName(),
+            //       defaultFormat, null, true);
+            //String[] result = PinyinHelper.toHanyuPinyinStringArray(mContactItems.get(i).getName().charAt(0));
+            continute = true;
+            char firstLetter = mContactItems.get(i).getName().charAt(0);
+            if(firstLetter > 128) {
+                System.out.println("mContactItems.get(i).getName().charAt(0)" + mContactItems.get(i).getName().charAt(0));
+                try {
+                    String[] result = PinyinHelper.toHanyuPinyinStringArray(mContactItems.get(i).getName().charAt(0), defaultFormat);
+                    if (result != null) {
+                        if(result.length == 1){
+                            sortLetter = result[0].substring(0,1);
+                            System.out.println(sortLetter);
+                        }else {
+                            if (result.length > 1) {
+                                for (String tmp : result) {
+                                    if (tmp.equals(lastSortLetter)) {
+                                        sortLetter = tmp.substring(0, 1);
+                                        continute = false;
+                                        break;
+                                    }
+                                }
+                                if(continute){
+                                    for(String tmp : result){
+                                        if(tmp.compareTo(lastSortLetter) == 1){
+                                            sortLetter = tmp.substring(0, 1);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        System.out.println("result is null");
+                    }
+                } catch (BadHanyuPinyinOutputFormatCombination badHanyuPinyinOutputFormatCombination) {
+                    badHanyuPinyinOutputFormatCombination.printStackTrace();
+                }
+            }else{
+                System.out.println("不是汉字");
+                if(firstLetter >= 'a' && firstLetter <= 'z'){
+                    sortLetter = String.valueOf((char) (firstLetter - 'a' + 'A'));
+                }else{
+                    sortLetter = String.valueOf(firstLetter);
+                }
+            }
+            //System.out.println("result.length:" + result.length);
+            //for(int k = 0; k < result.length; k++)
+            //    System.out.println("---------------" + result[k] + " " + result[k].length());
+            //sortLetter = pinyin.substring(0,1).toUpperCase();
+            //String pinyin = CharacterParser.getSelling(mContactItems.get(i).getName());
             mContactItems.get(i).setmPinYin(pinyin);
-            //System.out.println(pinyin);
-            String sortLetter = pinyin.substring(0,1).toUpperCase();
-            //System.out.println(sortLetter);
+            System.out.println(pinyin);
+            System.out.println(sortLetter);
+            lastSortLetter = sortLetter;
             if(sortLetter.matches("[A-Z]")){
                 mContactItems.get(i).setmSection(sortLetter);
             }else{

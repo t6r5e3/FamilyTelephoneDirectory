@@ -118,8 +118,13 @@ public class RecordExpandAdapter extends BaseExpandableListAdapter {
         DBManager dbHelper;
         dbHelper=new DBManager(mContext);
         dbHelper.createDataBase();
-        recordGroupHolder.tvAddress.setText(dbHelper.getResult(recordItem.getNumber()));
-
+        String address = dbHelper.getResult(recordItem.getNumber());
+        if(!TextUtils.isEmpty(address)){
+            recordGroupHolder.tvAddress.setVisibility(View.VISIBLE);
+            recordGroupHolder.tvAddress.setText(address);
+        }else{
+            recordGroupHolder.tvAddress.setVisibility(View.GONE);
+        }
 
         if(isExpanded) {
             recordGroupHolder.llBackground.setBackgroundColor(Color.parseColor("#ffffff"));
@@ -153,12 +158,12 @@ public class RecordExpandAdapter extends BaseExpandableListAdapter {
                 @Override
                 public void onClick(View v) {
 
-                    //SweetAlertDialog是导入德第三方dialog
+                    //SweetAlertDialog是导入的第三方dialog
                     new SweetAlertDialog(mContext, SweetAlertDialog.WARNING_TYPE)
-                            .setTitleText("Are you sure?")
-                            .setContentText("Won't be able to recover this record!")
-                            .setCancelText("Cancel")
-                            .setConfirmText("Delete")
+                            .setTitleText("要删除吗?")
+                            .setContentText("系统将删除该组通话记录。")
+                            .setCancelText("取消")
+                            .setConfirmText("删除")
                             .showCancelButton(true)
                             .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                                 @Override
@@ -171,9 +176,9 @@ public class RecordExpandAdapter extends BaseExpandableListAdapter {
                                     mRecordItems.remove(groupPosition);
                                     mAdapterListener.MynotifyDataSetChanged(groupPosition);
 
-                                    sDialog.setTitleText("Deleted!")
-                                            .setContentText("Your record has been deleted!")
-                                            .setConfirmText("OK")
+                                    sDialog.setTitleText("已删除!")
+                                            .setContentText("该组通话记录已被删除!")
+                                            .setConfirmText("确认")
                                             .showCancelButton(false)
                                             .setCancelClickListener(null)
                                             .setConfirmClickListener(null)
