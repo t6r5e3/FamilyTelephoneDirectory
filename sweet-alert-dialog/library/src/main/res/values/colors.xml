@@ -10,15 +10,10 @@
     <color name="red_btn_bg_color">#DD6B55</color>
     <color name="red_btn_bg_pressed_color">#CD5B55</color>
     <color name="error_stroke_color">#F27474</color>
-<<<<<<< HEAD
-    <color name="success_stroke_color">#A5DC86</color>
-    <color name="trans_success_stroke_color">#33A5DC86</color>
-=======
     <!--<color name="success_stroke_color">#A5DC86</color> -->
     <!--<color name="trans_success_stroke_color">#33A5DC86</color>-->
     <color name="success_stroke_color">#0288d1</color>
     <color name="trans_success_stroke_color">#330288d1</color>
->>>>>>> 1e32fa5f5aa06eb20673730b3f1ff22ae685b496
     <color name="warning_stroke_color">#0288d1</color>
     <color name="text_color">#575757</color>
     <color name="material_blue_grey_80">#ff37474f</color>
