@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="android-vcard">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/.idea/libraries/android-vcard.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/libs/android-vcard.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
