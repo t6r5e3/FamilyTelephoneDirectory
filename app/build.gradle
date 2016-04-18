@@ -20,7 +20,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:cardview-v7:23.1.1'
@@ -30,5 +30,5 @@ dependencies {
     compile project(':sweet-alert-dialog:library')
     compile 'com.github.obiteaaron:pinyin4j-multi:1.0.0'
     compile 'org.apache.httpcomponents:httpcore:4.4.4'
-    compile files('D:/AndroidApp/new0418/FamilyTelephoneDirectory/.idea/libraries/android-vcard.jar')
+    compile files('libs/android-vcard.jar')
 }
