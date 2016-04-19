@@ -110,11 +110,16 @@ public class RecordExpandAdapter extends BaseExpandableListAdapter {
             recordGroupHolder = (RecordGroupHolder) convertView.getTag();
         }
         final RecordItem recordItem = mRecordItems.get(groupPosition);
-        //address
+        //address----------------------------------------------------
         DBManager dbHelper;
-        dbHelper=new DBManager(mContext);
-        dbHelper.createDataBase();
-        String address = dbHelper.getResult(recordItem.getNumber());
+        dbHelper=DBManager.getInstance(mContext);
+        String address = null;
+        try {
+            address = dbHelper.getResult(recordItem.getNumber());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         if(!TextUtils.isEmpty(address)){
             recordGroupHolder.tvAddress.setVisibility(View.VISIBLE);
             recordGroupHolder.tvAddress.setText(address);
