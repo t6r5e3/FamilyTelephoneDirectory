@@ -1,17 +1,13 @@
 package com.example.sysucjl.familytelephonedirectory.adapter;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
 import android.provider.CallLog;
-import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -174,7 +170,7 @@ public class RecordExpandAdapter extends BaseExpandableListAdapter {
                                         tool.deleteRecord(mContext,recordItem.getRecordSegments().get(i).getId());
                                     }
                                     mRecordItems.remove(groupPosition);
-                                    mAdapterListener.MynotifyDataSetChanged(groupPosition);
+                                    mAdapterListener.mynotifyDataSetChanged(groupPosition);
 
                                     sDialog.setTitleText("已删除!")
                                             .setContentText("该组通话记录已被删除!")
@@ -358,7 +354,7 @@ public class RecordExpandAdapter extends BaseExpandableListAdapter {
 
     public interface RecordAdapterListener{
         public void collapseGroup(int groupPosition);
-        public void MynotifyDataSetChanged(int groupPosition);
+        public void mynotifyDataSetChanged(int groupPosition);
     }
 }
 
