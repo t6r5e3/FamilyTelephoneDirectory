@@ -54,11 +54,14 @@ public class PhoneListAdapter extends ArrayAdapter<String> {
             phoneListHolder = (PhoneListHolder) convertView.getTag();
         }
         final String item = getItem(position);
-        //address
+        //address----------------------------------------------------------------
         DBManager dbHelper;
-        dbHelper=new DBManager(getContext());
-        dbHelper.createDataBase();
-        phoneListHolder.tvLocation.setText(dbHelper.getResult(item));
+        dbHelper=DBManager.getInstance(getContext());
+        try {
+            phoneListHolder.tvLocation.setText(dbHelper.getResult(item));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if(position == 0){
             phoneListHolder.ivPhone.setVisibility(View.VISIBLE);
