@@ -3,10 +3,12 @@ package com.example.sysucjl.familytelephonedirectory.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.database.ContentObserver;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.provider.CallLog;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -16,6 +18,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.sysucjl.familytelephonedirectory.R;
 import com.example.sysucjl.familytelephonedirectory.data.RecordItem;
@@ -39,6 +42,7 @@ public class RecordExpandAdapter extends BaseExpandableListAdapter {
     public RecordExpandAdapter(Context context, List<RecordItem> recordItems){
         this.mContext = context;
         this.mRecordItems = recordItems;
+        mContext.getContentResolver().registerContentObserver(CallLog.Calls.CONTENT_URI, true,new recordObserver(new Handler(),mContext,0));
     }
 
     @Override
@@ -170,7 +174,7 @@ public class RecordExpandAdapter extends BaseExpandableListAdapter {
                                         tool.deleteRecordById(mContext,recordItem.getRecordSegments().get(i).getId());
                                     }
                                     mRecordItems.remove(groupPosition);
-                                    mAdapterListener.mynotifyDataSetChanged(groupPosition);
+                                    mAdapterListener.myNotifyDataSetChanged(groupPosition);
 
                                     sDialog.setTitleText("已删除!")
                                             .setContentText("该组通话记录已被删除!")
@@ -353,8 +357,32 @@ public class RecordExpandAdapter extends BaseExpandableListAdapter {
     }
 
     public interface RecordAdapterListener{
+        public void expandGroup(int groupPosition);
         public void collapseGroup(int groupPosition);
-        public void mynotifyDataSetChanged(int groupPosition);
+        public void myNotifyDataSetChanged(int groupPosition);
+    }
+
+    class recordObserver extends ContentObserver {
+        private Context myContext;
+        private int position;
+
+        public recordObserver(Handler handler,Context context,int position) {
+            super(handler);
+            this.myContext = context;
+            this.position = position;
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            Toast.makeText(myContext,"database has changed!",Toast.LENGTH_SHORT).show();
+            super.onChange(selfChange);
+            ContactOptionManager contactOptionManager = new ContactOptionManager();
+            mRecordItems = contactOptionManager.getCallLog(myContext);
+            mAdapterListener.myNotifyDataSetChanged(position);
+            mAdapterListener.expandGroup(position);
+            mAdapterListener.collapseGroup(position);
+            myContext.getContentResolver().unregisterContentObserver(this);
+        }
     }
 }
 
