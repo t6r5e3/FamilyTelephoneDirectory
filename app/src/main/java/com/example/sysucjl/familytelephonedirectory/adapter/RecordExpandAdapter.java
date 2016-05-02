@@ -167,7 +167,7 @@ public class RecordExpandAdapter extends BaseExpandableListAdapter {
 
                                     ContactOptionManager tool = new ContactOptionManager();
                                     for(int i=0;i<recordItem.getRecordSegments().size();i++){
-                                        tool.deleteRecord(mContext,recordItem.getRecordSegments().get(i).getId());
+                                        tool.deleteRecordById(mContext,recordItem.getRecordSegments().get(i).getId());
                                     }
                                     mRecordItems.remove(groupPosition);
                                     mAdapterListener.mynotifyDataSetChanged(groupPosition);

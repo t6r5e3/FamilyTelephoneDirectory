@@ -20,15 +20,22 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.sysucjl.familytelephonedirectory.adapter.PhoneListAdapter;
 import com.example.sysucjl.familytelephonedirectory.data.CityInfo;
 import com.example.sysucjl.familytelephonedirectory.data.WeatherInfo;
+import com.example.sysucjl.familytelephonedirectory.tools.BlackListOptionManager;
 import com.example.sysucjl.familytelephonedirectory.tools.ColorUtils;
+import com.example.sysucjl.familytelephonedirectory.tools.ContactOptionManager;
 import com.example.sysucjl.familytelephonedirectory.tools.DBManager;
 import com.example.sysucjl.familytelephonedirectory.tools.QueryWeather;
 
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.List;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class PersonInfoActivity extends AppCompatActivity {
 
@@ -36,6 +43,7 @@ public class PersonInfoActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private CollapsingToolbarLayout mToolbarLayout;
     private Button btnSentMessage;
+    private Button btnBlacklist;
     private View vStatusBar;
     private PhoneListAdapter mAdapter;
     DBManager dbHelper;
@@ -86,6 +94,15 @@ public class PersonInfoActivity extends AppCompatActivity {
         mToolbarLayout.setTitle(personName);
         btnSentMessage = (Button) findViewById(R.id.btn_sent_mesage);
         btnSentMessage.setBackgroundColor(color);
+        btnBlacklist = (Button)findViewById(R.id.btn_blacklist);
+        btnBlacklist.setBackgroundColor(color);
+
+        btnSentMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(PersonInfoActivity.this,"Hello",Toast.LENGTH_SHORT).show();
+            }
+        });
 
         dbHelper=new DBManager(this);
         dbHelper.createDataBase();
@@ -109,7 +126,7 @@ public class PersonInfoActivity extends AppCompatActivity {
             @Override
             public void onGenerated(Palette palette) {
                 Palette.Swatch vibrant = palette.getVibrantSwatch();
-                if(vibrant != null){
+                if (vibrant != null) {
                     mToolbarLayout.setContentScrimColor(vibrant.getRgb());
                     btnSentMessage.setBackgroundColor(vibrant.getRgb());
                     mAdapter.setmColor(vibrant.getRgb());
@@ -117,14 +134,130 @@ public class PersonInfoActivity extends AppCompatActivity {
             }
         });
 
-        if(intent.getStringExtra("tab_name").equals("contact")){
-            mAdapter = new PhoneListAdapter(this,R.layout.list_phone_item,intent.getStringArrayListExtra("phonelist"), color);
-            final ListView phoneList = (ListView)findViewById(R.id.phone_list);
+        if(intent.getStringExtra("tab_name").equals("contact")) {
+            final ArrayList<String> phones = intent.getStringArrayListExtra("phonelist");
+            mAdapter = new PhoneListAdapter(this, R.layout.list_phone_item, phones, color);
+            final ListView phoneList = (ListView) findViewById(R.id.phone_list);
 
             phoneList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     mAdapter.getView(position, view, phoneList);
+                }
+            });
+
+            final BlackListOptionManager blackListOptionManager = new BlackListOptionManager(this);
+            final List<String> blacklist = blackListOptionManager.findAll();
+            /*
+            btnBlacklist.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(PersonInfoActivity.this,"Hello",Toast.LENGTH_SHORT).show();
+                }
+            });
+            */
+
+            boolean is_all_in_blacklist = true;
+            for(int i=0;i<phones.size();i++){
+                if(!blacklist.contains(phones.get(i))){
+                    is_all_in_blacklist = false;
+                    break;
+                }
+            }
+            if(is_all_in_blacklist){
+                btnBlacklist.setText("移出黑名单");
+            }
+            else{
+                btnBlacklist.setText("加入黑名单");
+            }
+            final boolean[] out_or_in_blacklist = {is_all_in_blacklist};
+            btnBlacklist.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    if(out_or_in_blacklist[0]){
+                        new SweetAlertDialog(PersonInfoActivity.this,SweetAlertDialog.WARNING_TYPE)
+                                .setTitleText("移出黑名单!")
+                                .setContentText("该电话将被移出黑名单")
+                                .setConfirmText("确认")
+                                .setCancelText("取消")
+                                .showCancelButton(true)
+                                .setCancelClickListener(null)
+                                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                    @Override
+                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                        for(int i=0;i<phones.size();i++){
+                                            blackListOptionManager.delete(phones.get(i));
+                                            blacklist.remove(phones.get(i));
+                                        }
+                                        sweetAlertDialog.setTitleText("移出成功")
+                                                        .setContentText("该电话已被移出黑名单")
+                                                        .setConfirmText("确认")
+                                                        .showCancelButton(false)
+                                                        .setCancelClickListener(null)
+                                                        .setConfirmClickListener(null)
+                                                        .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                                        btnBlacklist.setText("加入黑名单");
+                                        out_or_in_blacklist[0] = !out_or_in_blacklist[0];
+                                    }
+                                }).show();
+                    }
+                    else{
+                        new SweetAlertDialog(PersonInfoActivity.this,SweetAlertDialog.WARNING_TYPE)
+                                .setTitleText("加入黑名单!")
+                                .setContentText("该电话将被加入黑名单")
+                                .setConfirmText("确认")
+                                .setCancelText("取消")
+                                .showCancelButton(true)
+                                .setCancelClickListener(null)
+                                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                    @Override
+                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                        for(int i=0;i<phones.size();i++){
+                                            blackListOptionManager.add(phones.get(i));
+                                            blacklist.add(phones.get(i));
+                                        }
+                                        sweetAlertDialog.setTitleText("加入成功")
+                                                .setContentText("该电话已被加入黑名单")
+                                                .setConfirmText("确认")
+                                                .showCancelButton(false)
+                                                .setCancelClickListener(null)
+                                                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+
+                                                    @Override
+                                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                                        sweetAlertDialog.setTitleText("删除通讯记录")
+                                                                .setContentText("该联系人的通讯记录将被删除")
+                                                                .setConfirmText("确认")
+                                                                .showCancelButton(true)
+                                                                .setCancelText("取消")
+                                                                .setCancelClickListener(null)
+                                                                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                                                    @Override
+                                                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                                                                        ContactOptionManager contactOptionManager = new ContactOptionManager();
+                                                                        for (int i = 0; i < phones.size(); i++) {
+                                                                            contactOptionManager.deleteRecordByNumber(PersonInfoActivity.this, phones.get(i));
+                                                                        }
+                                                                        sweetAlertDialog.setTitleText("删除成功")
+                                                                                .setContentText("该联系人的通讯记录已被删除")
+                                                                                .setConfirmText("确认")
+                                                                                .showCancelButton(false)
+                                                                                .setCancelClickListener(null)
+                                                                                .setConfirmClickListener(null)
+                                                                                .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                                                                    }
+                                                                })
+                                                                .changeAlertType(SweetAlertDialog.WARNING_TYPE);
+                                                    }
+                                                })
+                                                .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+                                        btnBlacklist.setText("移出黑名单");
+                                        out_or_in_blacklist[0] = !out_or_in_blacklist[0];
+                                    }
+                                }).show();
+                    }
+
                 }
             });
 
