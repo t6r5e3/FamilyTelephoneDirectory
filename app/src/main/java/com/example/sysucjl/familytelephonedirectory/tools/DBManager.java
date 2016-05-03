@@ -9,12 +9,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -34,6 +36,9 @@ import java.io.OutputStream;
         * 如果有超过1M的大文件，则需要先分割为N个小文件，然后使用copyBigDatabase()替换copyDatabase()
         */
 public class DBManager extends SQLiteOpenHelper {
+    private AtomicInteger mOpenCounter = new AtomicInteger();
+    private static DBManager mInstance = null;
+    private SQLiteDatabase mDatabase;
     //用户数据库文件的版本
     private static final int DB_VERSION = 1;
     //数据库文件目标存放路径为系统默认位置，com.rys.lb 是你的包名
@@ -67,6 +72,8 @@ public class DBManager extends SQLiteOpenHelper {
      * @param factory 一般都是null
      * @param version 当前数据库的版本，值必须是整数并且是递增的状态
      */
+
+
     public DBManager(Context context, String name, CursorFactory factory, int version) {
 //必须通过super调用父类当中的构造函数
         super(context, name, null, version);
@@ -87,11 +94,20 @@ public class DBManager extends SQLiteOpenHelper {
         this(context, DB_PATH + DB_NAME);
     }
 
+    //单例模式，只开一个数据库
+    public synchronized static DBManager getInstance(Context context){
+        if(mInstance==null){
+            mInstance=new DBManager(context);
+        }
+        return mInstance;
+    }
+
+
     public void createDataBase()  {
         boolean dbExist = checkDataBase();
         if (dbExist) {
             //数据库已存在，do nothing.
-            System.out.println("数据库已经存在");
+            //System.out.println("数据库已经存在");
         } else {
             //创建数据库
             try {
@@ -124,7 +140,7 @@ public class DBManager extends SQLiteOpenHelper {
         }
         if (checkDB != null) {
             checkDB.close();
-            System.out.println("关闭");
+            //System.out.println("关闭");
         }
         return checkDB != null ? true : false;
     }
@@ -180,17 +196,14 @@ public class DBManager extends SQLiteOpenHelper {
         myOutput.close();
         System.out.println("数据库已经复制");
     }
-    //
-//    //用于得到归属地的数据库
-//    public DBManager getInstance(Context context){
-//        DBManager dbHelper = new DBManager(context,DB_NAME, null, 1);
-//        return dbHelper;
-//    }
-    public String getResult(String num){
-        DBManager dbHelper2=new DBManager(myContext,"callhome.db",null,1);
-        SQLiteDatabase db=dbHelper2.getReadableDatabase();
+
+    public static int count180=0;
+    public String getResult(String num) throws Exception {
+        //DBManager dbHelper2=new DBManager(myContext,"callhome.db",null,1);
+//        SQLiteDatabase db=mInstance.getReadableDatabase();
+        SQLiteDatabase db=mInstance.openDatabase();
         String number=num;
-        String result=null;
+        String result="";
         if (number.length() > 7) {
             String firstNum = number.substring(0, 1);
             if (number.length() >= 10) {
@@ -222,6 +235,7 @@ public class DBManager extends SQLiteOpenHelper {
                     String s1 = number.substring(0, 7);
                     String sql = "select location from mob_location where _id = ? ";
                     String[] param = new String[] { s1 };
+
                     if (db != null && db.isOpen()) {
                         Cursor cursor = db.rawQuery(sql, param);
                         if (cursor.moveToNext()) {
@@ -234,7 +248,11 @@ public class DBManager extends SQLiteOpenHelper {
                                 }
                             }
                             result=temp.substring(0,middleIndex)+temp.substring(middleIndex+1);
-                            //result=temp;
+                        }
+                        else {
+                            //查询网络，插入数据库
+                            ChildThread address=new ChildThread();
+                            address.sendRequestWithHttpURLConnection(myContext,s1);
                         }
                         cursor.close();
                     }
@@ -242,6 +260,7 @@ public class DBManager extends SQLiteOpenHelper {
             } else {
                 result = "本地号码";
             }
+            mInstance.closeDatabase();
         } else {
             if (number.length() < 4) {
                 result = "未知号码";
@@ -252,9 +271,22 @@ public class DBManager extends SQLiteOpenHelper {
         return result;
     }
 
+    public synchronized SQLiteDatabase openDatabase() {
+        if(mOpenCounter.incrementAndGet() == 1) {
+            // Opening new database
+            mDatabase = mInstance.getWritableDatabase();
+        }
+        return mDatabase;
+    }
 
+    public synchronized void closeDatabase() {
+        if(mOpenCounter.decrementAndGet() == 0) {
+            // Closing database
+            mDatabase.close();
+        }
+    }
 
-    public String getCityName(String num){
+    public String getCityName(String num) throws Exception {
         DBManager dbHelper2=new DBManager(myContext,"callhome.db",null,1);
         SQLiteDatabase db=dbHelper2.getReadableDatabase();
         String number=num;
@@ -277,10 +309,7 @@ public class DBManager extends SQLiteOpenHelper {
                         Cursor cursor = db.rawQuery(sql, param);
                         if (cursor.moveToNext()) {
                             //result = cursor.getString(0)+"固话";
-                            if(zhixiashi(cursor.getString(0)))
-                                result = cursor.getString(0);
-                            else
-                                result = cursor.getString(0).substring(2);
+                            result = cursor.getString(0).substring(2);
                         }
                         cursor.close();
                     }
@@ -305,11 +334,9 @@ public class DBManager extends SQLiteOpenHelper {
                                     break;
                                 }
                             }
-                           // result=temp.substring(0,middleIndex)+temp.substring(middleIndex+1);
-                            if(zhixiashi(temp.substring(0, 2)))
-                                result = temp.substring(0,2);
-                            else
-                                result=temp.substring(2,middleIndex);
+                            // result=temp.substring(0,middleIndex)+temp.substring(middleIndex+1);
+                            result=temp.substring(2,middleIndex);
+
                             //result=temp;
                         }
                         cursor.close();
@@ -326,12 +353,6 @@ public class DBManager extends SQLiteOpenHelper {
             }
         }
         return result;
-    }
-
-    private boolean zhixiashi(String str)
-    {
-        return str.toString().equals("北京")  ||  str.toString().equals("上海") || str.toString().equals("天津") || str.toString().equals("重庆");
-
     }
 
 
