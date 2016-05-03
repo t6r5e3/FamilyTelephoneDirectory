@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.example.sysucjl.familytelephonedirectory.R;
 import com.example.sysucjl.familytelephonedirectory.data.RecordItem;
 import com.example.sysucjl.familytelephonedirectory.data.RecordSegment;
+import com.example.sysucjl.familytelephonedirectory.tools.BlackListOptionManager;
 import com.example.sysucjl.familytelephonedirectory.tools.ColorUtils;
 import com.example.sysucjl.familytelephonedirectory.tools.ContactOptionManager;
 import com.example.sysucjl.familytelephonedirectory.tools.DBManager;
@@ -109,6 +110,7 @@ public class RecordExpandAdapter extends BaseExpandableListAdapter {
             recordGroupHolder.ivAvatarSim = (ImageView) convertView.findViewById(R.id.img_avatar_sim);
             recordGroupHolder.tvPhoneNum = (TextView) convertView.findViewById(R.id.tv_phonenum);
             recordGroupHolder.tvAddress = (TextView) convertView.findViewById(R.id.tv_record_address);
+            recordGroupHolder.tvAddBlacknumber = (TextView) convertView.findViewById(R.id.tv_add_blacknumber);
             convertView.setTag(recordGroupHolder);
         }else{
             recordGroupHolder = (RecordGroupHolder) convertView.getTag();
@@ -188,6 +190,29 @@ public class RecordExpandAdapter extends BaseExpandableListAdapter {
 
                             })
                             .show();
+                }
+            });
+
+            final BlackListOptionManager blom = new BlackListOptionManager(mContext);
+            if(blom.isBlackNumber(recordItem.getNumber())){
+                recordGroupHolder.tvAddBlacknumber.setText("取消拉黑");
+            }
+            else{
+                recordGroupHolder.tvAddBlacknumber.setText("拉黑");
+            }
+            final RecordGroupHolder finalRecordGroupHolder = recordGroupHolder;
+            recordGroupHolder.tvAddBlacknumber.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String phnum = recordItem.getNumber();
+                    if(blom.isBlackNumber(phnum)){
+                        blom.delete(phnum);
+                        finalRecordGroupHolder.tvAddBlacknumber.setText("拉黑");
+                    }
+                    else{
+                        blom.add(phnum);
+                        finalRecordGroupHolder.tvAddBlacknumber.setText("取消拉黑");
+                    }
                 }
             });
         }
@@ -335,7 +360,7 @@ public class RecordExpandAdapter extends BaseExpandableListAdapter {
     class RecordGroupHolder{
         public View vRecordDivide;
         public ImageView ivRecordIcon, ivAvatarSim;
-        public TextView tvRecordName, tvCallBack, tvDelete, tvPhoneNum,tvAddress;
+        public TextView tvRecordName, tvCallBack, tvDelete, tvPhoneNum, tvAddress, tvAddBlacknumber;
         public TextView tvRecordDate, tvAvatarName;
         public LinearLayout llBackground;
         public LinearLayout llRecordType;
