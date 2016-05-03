@@ -116,8 +116,14 @@ public class RecordFragment extends Fragment {
             }
 
             @Override
-            public void mynotifyDataSetChanged(int groupPosition) {
+            public void expandGroup(int groupPosition){
+                expandableListView.expandGroup(groupPosition);
+            }
+
+            @Override
+            public void myNotifyDataSetChanged(int groupPosition) {
                 mExpandAdapter.notifyDataSetChanged();
+                expandableListView.expandGroup(groupPosition);
                 expandableListView.collapseGroup(groupPosition);
             }
         });

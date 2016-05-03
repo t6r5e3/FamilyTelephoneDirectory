@@ -64,12 +64,20 @@ public class ContactOptionManager {
         return recordItems;
     }
 
-    //删除通讯记录
-    public void deleteRecord(Context context, int id) {
+    //根据记录ID来删除通讯记录
+    public void deleteRecordById(Context context, int id) {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         context.getContentResolver().delete(CallLog.Calls.CONTENT_URI, CallLog.Calls._ID + "=?", new String[]{id + ""});
+    }
+
+    //根据电话号码来删除通讯记录
+    public void deleteRecordByNumber(Context context, String phnumber) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        context.getContentResolver().delete(CallLog.Calls.CONTENT_URI, "number=?", new String[]{phnumber});
     }
 
     //读取联系人列表

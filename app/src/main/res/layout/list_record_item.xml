@@ -129,6 +129,17 @@
             android:textSize="12sp"
             android:textStyle="bold"
             android:text="删除"
+            android:layout_marginRight="15dp"
+            android:textColor="@color/colorTextLight"
+            />
+
+        <TextView
+            android:id="@+id/tv_add_blacknumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:text=""
             android:textColor="@color/colorTextLight"
             />
     </LinearLayout>

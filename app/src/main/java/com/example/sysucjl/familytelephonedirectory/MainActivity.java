@@ -198,4 +198,10 @@ public class MainActivity extends AppCompatActivity{
         }).start();
     }
 
+    @Override
+    protected void onDestroy(){
+        android.os.Process.killProcess(android.os.Process.myPid());
+        super.onDestroy();
+    }
+
 }
